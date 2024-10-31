@@ -1,12 +1,16 @@
 package com.example.djr_midterm_csi460.trip_management;
 
+import com.example.djr_midterm_csi460.DateUtils;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 
 // This class defines the database helper for the application, it creates the database and tables,
 // and provides methods for CRUD operations.
@@ -53,20 +57,24 @@ public class TripDBHelper extends SQLiteOpenHelper
             String endDate,
             String notes,
             int review
-    )
-    {
+    ) throws ParseException {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        putTripValues(destination, startDate, endDate, notes, review, values);
+        putTripValues(
+                destination,
+                DateUtils.parseDate(startDate),
+                DateUtils.parseDate(endDate),
+                notes,
+                review,
+                values
+        );
 
         db.insert(TABLE_NAME, null, values);
 
         db.close();
     }
-
-
 
     // getTrips method used for creating trips using the data from the columns in the trip table,
     // and returning them as an ArrayList
@@ -85,8 +93,8 @@ public class TripDBHelper extends SQLiteOpenHelper
                 tripModelArrayList.add(new Trip(
                         tripsCursor.getInt(0),
                         tripsCursor.getString(1),
-                        tripsCursor.getString(2),
-                        tripsCursor.getString(3),
+                        new Date(tripsCursor.getLong(2)),
+                        new Date(tripsCursor.getLong(3)),
                         tripsCursor.getString(4),
                         tripsCursor.getInt(5)
                 ));
@@ -98,6 +106,9 @@ public class TripDBHelper extends SQLiteOpenHelper
 
         db.close();
 
+        tripModelArrayList.sort(
+                (endDate1, endDate2) -> endDate2.getEndDate().compareTo(endDate1.getEndDate()));
+
         return tripModelArrayList;
     }
 
@@ -106,25 +117,25 @@ public class TripDBHelper extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery(
+        Cursor tripsCursor = db.rawQuery(
                 "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + "=?",
                 new String[]{String.valueOf(id)}
         );
 
-        if (cursor.moveToFirst())
+        if (tripsCursor.moveToFirst())
         {
 
             return new Trip(
-                    cursor.getInt(0),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    cursor.getString(3),
-                    cursor.getString(4),
-                    cursor.getInt(5)
+                    tripsCursor.getInt(0),
+                    tripsCursor.getString(1),
+                    new Date(tripsCursor.getLong(2)),
+                    new Date(tripsCursor.getLong(3)),
+                    tripsCursor.getString(4),
+                    tripsCursor.getInt(5)
             );
         }
 
-        cursor.close();
+        tripsCursor.close();
 
         db.close();
 
@@ -140,12 +151,20 @@ public class TripDBHelper extends SQLiteOpenHelper
             String notes,
             int review
     )
+    throws ParseException
     {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
 
-        putTripValues(destination, startDate, endDate, notes, review, values);
+        putTripValues(
+                destination,
+                DateUtils.parseDate(startDate),
+                DateUtils.parseDate(endDate),
+                notes,
+                review,
+                values
+        );
 
         db.update(TABLE_NAME, values, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
 
@@ -174,16 +193,16 @@ public class TripDBHelper extends SQLiteOpenHelper
     // putTripValues method used for putting values into the columns of the trip table
     private static void putTripValues(
             String destination,
-            String startDate,
-            String endDate,
+            Date startDate,
+            Date endDate,
             String notes,
             int review,
             ContentValues values
     )
     {
         values.put(COLUMN_DESTINATION, destination);
-        values.put(COLUMN_START_DATE, startDate);
-        values.put(COLUMN_END_DATE, endDate);
+        values.put(COLUMN_START_DATE, startDate.getTime());
+        values.put(COLUMN_END_DATE, endDate.getTime());
         values.put(COLUMN_NOTES, notes);
         values.put(COLUMN_REVIEW, review);
     }

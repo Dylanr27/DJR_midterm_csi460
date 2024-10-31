@@ -2,13 +2,17 @@ package com.example.djr_midterm_csi460.trip_management;
 
 import androidx.annotation.NonNull;
 
+import com.example.djr_midterm_csi460.DateUtils;
+
+import java.util.Date;
+
 // This class defines the Trip model for the database.
 public class Trip
 {
     private int id;
     private String destination;
-    private String startDate;
-    private String endDate;
+    private Date startDate;
+    private Date endDate;
     private String notes;
     private int review;
 
@@ -16,8 +20,8 @@ public class Trip
     public Trip(
             int id,
             String destination,
-            String start_date,
-            String end_date,
+            Date start_date,
+            Date end_date,
             String notes,
             int review
     )
@@ -46,22 +50,32 @@ public class Trip
         this.destination = destination;
     }
 
-    public String getStartDate()
+    public Date getStartDate()
     {
         return startDate;
     }
 
-    public void setStartDate(String startDate)
+    public String getStartDateString()
+    {
+        return DateUtils.formatDate(startDate);
+    }
+
+    public void setStartDate(Date startDate)
     {
         this.startDate = startDate;
     }
 
-    public String getEndDate()
+    public Date getEndDate()
     {
         return endDate;
     }
 
-    public void setEndDate(String endDate)
+    public String getEndDateString()
+    {
+        return DateUtils.formatDate(endDate);
+    }
+
+    public void setEndDate(Date endDate)
     {
         this.endDate = endDate;
     }

@@ -50,8 +50,8 @@ public class TripRVAdapter extends RecyclerView.Adapter<TripRVAdapter.ViewHolder
         Trip model = tripModelArrayList.get(position);
 
         holder.tvDestination.setText("Destination: " + model.getDestination());
-        holder.tvStartDate.setText("Start-Date: " + model.getStartDate());
-        holder.tvEndDate.setText("End-Date: " + model.getEndDate());
+        holder.tvStartDate.setText("Start-Date: \n" + model.getStartDateString());
+        holder.tvEndDate.setText("End-Date: \n" + model.getEndDateString());
         holder.tvNotes.setText("Notes: " + model.getNotes());
         holder.rbReview.setRating(model.getReview());
         holder.rbReview.setIsIndicator(true);

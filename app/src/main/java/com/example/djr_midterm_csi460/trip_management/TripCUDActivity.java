@@ -11,11 +11,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.djr_midterm_csi460.DateUtils;
 import com.example.djr_midterm_csi460.R;
 
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Locale;
 import jp.wasabeef.richeditor.RichEditor;
 
 // This class defines the activity for creating, updating, and deleting trips
@@ -27,9 +27,7 @@ public class TripCUDActivity extends AppCompatActivity
     private TextView tvStartDate, tvEndDate;
     private RichEditor reNotes;
     private RatingBar rbReview;
-
     private Calendar calendar = Calendar.getInstance();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
 
     // this method is called when the activity is created. Initializes the UI elements,
     // retrieves trip data if in edit mode, and sets up the click listeners for the buttons.
@@ -75,8 +73,8 @@ public class TripCUDActivity extends AppCompatActivity
             }
 
             etDestination.setText(trip.getDestination());
-            tvStartDate.setText(trip.getStartDate());
-            tvEndDate.setText(trip.getEndDate());
+            tvStartDate.setText(trip.getStartDateString());
+            tvEndDate.setText(trip.getEndDateString());
             reNotes.setHtml(trip.getNotes());
             rbReview.setRating(trip.getReview());
             btnCreateUpdateTrip.setText("Update Trip");
@@ -132,7 +130,11 @@ public class TripCUDActivity extends AppCompatActivity
 
                     int tripId = intent.getIntExtra("id", -1);
 
-                    tripDbHelper.updateTrip(tripId, destination, startDate, endDate, notes, review);
+                    try {
+                        tripDbHelper.updateTrip(tripId, destination, startDate, endDate, notes, review);
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     toast("Trip updated successfully");
 
@@ -141,7 +143,11 @@ public class TripCUDActivity extends AppCompatActivity
                     return;
                 }
 
-                tripDbHelper.createTrip(destination, startDate, endDate, notes, review);
+                try {
+                    tripDbHelper.createTrip(destination, startDate, endDate, notes, review);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
 
                 toast("Trip created successfully");
 
@@ -181,7 +187,7 @@ public class TripCUDActivity extends AppCompatActivity
                     calendar.set(Calendar.YEAR, year);
                     calendar.set(Calendar.MONTH, month);
                     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    textView.setText(dateFormat.format(calendar.getTime()));
+                    textView.setText(DateUtils.formatDate(calendar.getTime()));
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -207,4 +213,5 @@ public class TripCUDActivity extends AppCompatActivity
     {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
 }
