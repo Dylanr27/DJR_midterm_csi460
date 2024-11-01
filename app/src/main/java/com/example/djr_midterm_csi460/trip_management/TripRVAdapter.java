@@ -84,7 +84,7 @@ public class TripRVAdapter extends RecyclerView.Adapter<TripRVAdapter.ViewHolder
     }
 
 
-    // ViewHolder class used for holding the views to represent each item tripModelArrayList
+    // ViewHolder class used for holding the views to represent each item in the tripModelArrayList
     public static class ViewHolder extends RecyclerView.ViewHolder
     {
         private TextView tvDestination, tvStartDate, tvEndDate, tvNotes;

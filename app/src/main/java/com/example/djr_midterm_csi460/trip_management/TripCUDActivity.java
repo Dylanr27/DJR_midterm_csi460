@@ -16,14 +16,16 @@ import com.example.djr_midterm_csi460.R;
 
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.TimeZone;
+
 import jp.wasabeef.richeditor.RichEditor;
 
 // This class defines the activity for creating, updating, and deleting trips
 public class TripCUDActivity extends AppCompatActivity
 {
-    private TripDBHelper tripDbHelper;
+    private DBHelper dbHelper;
     private EditText etDestination, etNotes;
-    private Button btnSelectStartDate, btnSelectEndDate, btnCreateUpdateTrip, btnDelete;
+    private Button btnSelectStartDate, btnSelectEndDate, btnCreateUpdateTrip, btnDelete, btnBack;
     private TextView tvStartDate, tvEndDate;
     private RichEditor reNotes;
     private RatingBar rbReview;
@@ -36,9 +38,9 @@ public class TripCUDActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_add_edit_trip);
+        setContentView(R.layout.activity_trip_cud);
 
-        tripDbHelper = new TripDBHelper(this);
+        dbHelper = new DBHelper(this);
         etDestination = findViewById(R.id.etDestination);
         btnSelectStartDate = findViewById(R.id.btnSelectStartDate);
         btnSelectEndDate = findViewById(R.id.btnSelectEndDate);
@@ -48,6 +50,7 @@ public class TripCUDActivity extends AppCompatActivity
         rbReview = findViewById(R.id.rbReview);
         btnCreateUpdateTrip = findViewById(R.id.btnCreateEditTrip);
         btnDelete = findViewById(R.id.btnDelete);
+        btnBack = findViewById(R.id.btnBack);
 
         Intent intent = getIntent();
 
@@ -59,7 +62,7 @@ public class TripCUDActivity extends AppCompatActivity
         {
             btnDelete.setVisibility(View.VISIBLE);
 
-            Trip trip = tripDbHelper.getTrip(intent.getIntExtra("id", -1));
+            Trip trip = dbHelper.getTrip(intent.getIntExtra("id", -1));
 
             // if this check fails, we know the trip exists and the id is valid, therefore we will
             // not be checking if id is -1 or null for the other methods in this class
@@ -131,7 +134,7 @@ public class TripCUDActivity extends AppCompatActivity
                     int tripId = intent.getIntExtra("id", -1);
 
                     try {
-                        tripDbHelper.updateTrip(tripId, destination, startDate, endDate, notes, review);
+                        dbHelper.updateTrip(tripId, destination, startDate, endDate, notes, review);
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
@@ -144,7 +147,7 @@ public class TripCUDActivity extends AppCompatActivity
                 }
 
                 try {
-                    tripDbHelper.createTrip(destination, startDate, endDate, notes, review);
+                    dbHelper.createTrip(destination, startDate, endDate, notes, review);
                 } catch (ParseException e) {
                     throw new RuntimeException(e);
                 }
@@ -166,7 +169,7 @@ public class TripCUDActivity extends AppCompatActivity
 
                 int tripId = intent.getIntExtra("id", -1);
 
-                tripDbHelper.deleteTrip(tripId);
+                dbHelper.deleteTrip(tripId);
 
                 toast("Trip deleted successfully");
 
@@ -174,6 +177,15 @@ public class TripCUDActivity extends AppCompatActivity
             }
         });
 
+        // returns to the main activity if the back button is clicked
+        btnBack.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick (View v)
+            {
+                finish();
+            }
+        });
     }
 
     // this method is used for showing a date picker dialog and setting the
@@ -187,6 +199,7 @@ public class TripCUDActivity extends AppCompatActivity
                     calendar.set(Calendar.YEAR, year);
                     calendar.set(Calendar.MONTH, month);
                     calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
                     textView.setText(DateUtils.formatDate(calendar.getTime()));
                 },
                 calendar.get(Calendar.YEAR),

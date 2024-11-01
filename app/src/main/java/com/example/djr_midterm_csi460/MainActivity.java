@@ -8,9 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.djr_midterm_csi460.trip_management.DBHelper;
 import com.example.djr_midterm_csi460.trip_management.Trip;
 import com.example.djr_midterm_csi460.trip_management.TripCUDActivity;
-import com.example.djr_midterm_csi460.trip_management.TripDBHelper;
 import com.example.djr_midterm_csi460.trip_management.TripRVAdapter;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 // it also displays a list of trips in card form
 public class MainActivity extends AppCompatActivity
 {
-    private TripDBHelper tripDbHelper;
+    private DBHelper dbHelper;
     private Button btnAddTrip;
     private ArrayList<Trip> tripModelArrayList;
     private TripRVAdapter tripRVAdapter;
@@ -37,11 +37,11 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
 
-        tripDbHelper = new TripDBHelper(this);
+        dbHelper = new DBHelper(this);
 
         btnAddTrip = findViewById(R.id.btnAddTrip);
 
-        // Set up the add button to open the TripCUDActivity when clicked
+        // when the add button is clicked, it opens the TripCUDActivity to create a new trip
         btnAddTrip.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
     {
         tripModelArrayList = new ArrayList<>();
 
-        tripModelArrayList = tripDbHelper.getTrips();
+        tripModelArrayList = dbHelper.getTrips();
 
         tripRVAdapter = new TripRVAdapter(tripModelArrayList, this);
 
